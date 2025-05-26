@@ -37,7 +37,7 @@ let memory = RedisMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect(
     "redis://localhost:6379",
 ).await.unwrap();
 
-// optionally, add an encryption layer (recommended)
+// optionally, add the encryption layer (recommended)
 // let memory = MemoryEncryptionLayer::new(&key, InMemory::default());
 
 let findex = Findex::new(memory, dummy_encode::<WORD_LENGTH, Value>, dummy_decode);
