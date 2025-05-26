@@ -228,135 +228,132 @@ impl<const ADDRESS_LENGTH: usize, const WORD_LENGTH: usize> MemoryADT
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     //! To run the postgresql benchmarks locally, add the following service to your pg_service.conf file
-//     //! (usually under ~/.pg_service.conf):
-//     //!
-//     //! [cosmian_service]
-//     //! host=localhost
-//     //! dbname=cosmian
-//     //! user=cosmian
-//     //! password=cosmian
-//     use deadpool_postgres::Config;
-//     use tokio_postgres::NoTls;
+#[cfg(test)]
+mod tests {
+    //! To run the postgresql benchmarks locally, add the following service to your pg_service.conf file
+    //! (usually under ~/.pg_service.conf):
+    //!
+    //! [cosmian_service]
+    //! host=localhost
+    //! dbname=cosmian
+    //! user=cosmian
+    //! password=cosmian
+    use deadpool_postgres::Config;
+    use tokio_postgres::NoTls;
 
-//     use super::*;
-//     use crate::{
-//         test_utils::{
-//             gen_seed, test_guarded_write_concurrent, test_rw_same_address,
-//             test_single_write_and_read, test_wrong_guard,
-//         },
-//         Address, ADDRESS_LENGTH, WORD_LENGTH,
-//     };
+    use super::*;
+    use cosmian_findex::{
+        gen_seed, test_guarded_write_concurrent, test_rw_same_address, test_single_write_and_read,
+        test_wrong_guard, ADDRESS_LENGTH, WORD_LENGTH,
+    };
 
-//     const DB_URL: &str = "postgres://cosmian:cosmian@localhost/cosmian";
+    const DB_URL: &str = "postgres://cosmian:cosmian@localhost/cosmian";
 
-//     // Template function for pool creation
-//     pub async fn create_testing_pool(db_url: &str) -> Result<Pool, PostgresMemoryError> {
-//         let mut pg_config = Config::new();
-//         pg_config.url = Some(db_url.to_string());
-//         let pool = pg_config.builder(NoTls)?.build()?;
-//         Ok(pool)
-//     }
+    // Template function for pool creation
+    pub async fn create_testing_pool(db_url: &str) -> Result<Pool, PostgresMemoryError> {
+        let mut pg_config = Config::new();
+        pg_config.url = Some(db_url.to_string());
+        let pool = pg_config.builder(NoTls)?.build()?;
+        Ok(pool)
+    }
 
-//     // Setup function that handles pool creation, memory initialization, test execution, and cleanup
-//     async fn setup_and_run_test<F, Fut>(
-//         table_name: &str,
-//         test_fn: F,
-//     ) -> Result<(), PostgresMemoryError>
-//     where
-//         F: FnOnce(PostgresMemory<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>) -> Fut + Send,
-//         Fut: std::future::Future<Output = ()> + Send,
-//     {
-//         let test_pool = create_testing_pool(DB_URL).await.unwrap();
-//         let m = PostgresMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect_with_pool(
-//             test_pool.clone(),
-//             table_name.to_string(),
-//         )
-//         .await?;
+    // Setup function that handles pool creation, memory initialization, test execution, and cleanup
+    async fn setup_and_run_test<F, Fut>(
+        table_name: &str,
+        test_fn: F,
+    ) -> Result<(), PostgresMemoryError>
+    where
+        F: FnOnce(PostgresMemory<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>) -> Fut + Send,
+        Fut: std::future::Future<Output = ()> + Send,
+    {
+        let test_pool = create_testing_pool(DB_URL).await.unwrap();
+        let m = PostgresMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect_with_pool(
+            test_pool.clone(),
+            table_name.to_string(),
+        )
+        .await?;
 
-//         m.initialize_table(DB_URL.to_string(), table_name.to_string(), NoTls)
-//             .await?;
+        m.initialize_table(DB_URL.to_string(), table_name.to_string(), NoTls)
+            .await?;
 
-//         test_fn(m).await;
+        test_fn(m).await;
 
-//         // Cleanup - drop the table to avoid flacky tests
-//         test_pool
-//             .get()
-//             .await?
-//             .execute(&format!("DROP table {};", table_name), &[])
-//             .await?;
+        // Cleanup - drop the table to avoid flacky tests
+        test_pool
+            .get()
+            .await?
+            .execute(&format!("DROP table {};", table_name), &[])
+            .await?;
 
-//         Ok(())
-//     }
+        Ok(())
+    }
 
-//     #[tokio::test]
-//     async fn test_initialization() -> Result<(), PostgresMemoryError> {
-//         let table_name: &str = "test_initialization";
-//         let test_pool = create_testing_pool(DB_URL).await.unwrap();
-//         let m = PostgresMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect_with_pool(
-//             test_pool.clone(),
-//             table_name.to_string(),
-//         )
-//         .await?;
+    #[tokio::test]
+    async fn test_initialization() -> Result<(), PostgresMemoryError> {
+        let table_name: &str = "test_initialization";
+        let test_pool = create_testing_pool(DB_URL).await.unwrap();
+        let m = PostgresMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect_with_pool(
+            test_pool.clone(),
+            table_name.to_string(),
+        )
+        .await?;
 
-//         m.initialize_table(DB_URL.to_string(), table_name.to_string(), NoTls)
-//             .await?;
+        m.initialize_table(DB_URL.to_string(), table_name.to_string(), NoTls)
+            .await?;
 
-//         // check that the table actually exists
-//         let client = test_pool.get().await?;
-//         let returned = client
-//             .query(
-//                 &format!(
-//                     "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{}';",
-//                     table_name
-//                 ),
-//                 &[],
-//             )
-//             .await?;
+        // check that the table actually exists
+        let client = test_pool.get().await?;
+        let returned = client
+            .query(
+                &format!(
+                    "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{}';",
+                    table_name
+                ),
+                &[],
+            )
+            .await?;
 
-//         assert_eq!(returned[0].get::<_, i64>(0), 1);
+        assert_eq!(returned[0].get::<_, i64>(0), 1);
 
-//         // Cleanup - drop the table to avoid flacky tests
-//         test_pool
-//             .get()
-//             .await?
-//             .execute(&format!("DROP table {table_name};"), &[])
-//             .await?;
+        // Cleanup - drop the table to avoid flacky tests
+        test_pool
+            .get()
+            .await?
+            .execute(&format!("DROP table {table_name};"), &[])
+            .await?;
 
-//         Ok(())
-//     }
+        Ok(())
+    }
 
-//     #[tokio::test]
-//     async fn test_rw_seq() -> Result<(), PostgresMemoryError> {
-//         setup_and_run_test("findex_test_rw_seq", |m| async move {
-//             test_single_write_and_read::<WORD_LENGTH, _>(&m, gen_seed()).await;
-//         })
-//         .await
-//     }
+    #[tokio::test]
+    async fn test_rw_seq() -> Result<(), PostgresMemoryError> {
+        setup_and_run_test("findex_test_rw_seq", |m| async move {
+            test_single_write_and_read::<WORD_LENGTH, _>(&m, gen_seed()).await;
+        })
+        .await
+    }
 
-//     #[tokio::test]
-//     async fn test_guard_seq() -> Result<(), PostgresMemoryError> {
-//         setup_and_run_test("findex_test_guard_seq", |m| async move {
-//             test_wrong_guard::<WORD_LENGTH, _>(&m, gen_seed()).await;
-//         })
-//         .await
-//     }
+    #[tokio::test]
+    async fn test_guard_seq() -> Result<(), PostgresMemoryError> {
+        setup_and_run_test("findex_test_guard_seq", |m| async move {
+            test_wrong_guard::<WORD_LENGTH, _>(&m, gen_seed()).await;
+        })
+        .await
+    }
 
-//     #[tokio::test]
-//     async fn test_rw_same_address_seq() -> Result<(), PostgresMemoryError> {
-//         setup_and_run_test("findex_test_rw_same_address_seq", |m| async move {
-//             test_rw_same_address::<WORD_LENGTH, _>(&m, gen_seed()).await;
-//         })
-//         .await
-//     }
+    #[tokio::test]
+    async fn test_rw_same_address_seq() -> Result<(), PostgresMemoryError> {
+        setup_and_run_test("findex_test_rw_same_address_seq", |m| async move {
+            test_rw_same_address::<WORD_LENGTH, _>(&m, gen_seed()).await;
+        })
+        .await
+    }
 
-//     #[tokio::test]
-//     async fn test_rw_ccr() -> Result<(), PostgresMemoryError> {
-//         setup_and_run_test("findex_test_rw_ccr", |m| async move {
-//             test_guarded_write_concurrent::<WORD_LENGTH, _>(&m, gen_seed(), Some(100)).await;
-//         })
-//         .await
-//     }
-// }
+    #[tokio::test]
+    async fn test_rw_ccr() -> Result<(), PostgresMemoryError> {
+        setup_and_run_test("findex_test_rw_ccr", |m| async move {
+            test_guarded_write_concurrent::<WORD_LENGTH, _>(&m, gen_seed(), Some(100)).await;
+        })
+        .await
+    }
+}

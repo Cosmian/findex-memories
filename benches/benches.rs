@@ -3,14 +3,14 @@
 // #![allow(unused_imports, unused_variables, unused_mut, dead_code)]
 
 // use cosmian_crypto_core::{
-//     CsRng,
 //     reexport::rand_core::{RngCore, SeedableRng},
+//     CsRng,
 // };
 // use cosmian_findex::{
 //     bench_memory_contention, bench_memory_insert_multiple_bindings, bench_memory_one_to_many,
 //     bench_memory_search_multiple_bindings, bench_memory_search_multiple_keywords,
 // };
-// use criterion::{Criterion, criterion_group, criterion_main};
+// use criterion::{criterion_group, criterion_main, Criterion};
 
 // #[cfg(feature = "rust-mem")]
 // use cosmian_findex::InMemory;
@@ -43,7 +43,7 @@
 //     )
 // }
 
-// use cosmian_findex::{ADDRESS_LENGTH, Address, WORD_LENGTH};
+// use cosmian_findex::{Address, ADDRESS_LENGTH, WORD_LENGTH};
 // // Utility function used to initialize the PostgresMemory table
 // #[cfg(feature = "postgres-mem")]
 // async fn connect_and_init_table(

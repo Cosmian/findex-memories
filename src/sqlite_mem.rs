@@ -204,46 +204,46 @@ impl<const ADDRESS_LENGTH: usize, const WORD_LENGTH: usize> MemoryADT
     }
 }
 
-// #[cfg(test)]
-// mod tests {
+#[cfg(test)]
+mod tests {
 
-//     use super::*;
-//     use crate::{
-//         gen_seed, test_guarded_write_concurrent, test_rw_same_address, test_single_write_and_read,
-//         test_wrong_guard, WORD_LENGTH,
-//     };
+    use super::*;
+    use cosmian_findex::{
+        gen_seed, test_guarded_write_concurrent, test_rw_same_address, test_single_write_and_read,
+        test_wrong_guard, WORD_LENGTH,
+    };
 
-//     const DB_PATH: &str = "./target/debug/sqlite-test.db";
+    const DB_PATH: &str = "./target/debug/sqlite-test.db";
 
-//     #[tokio::test]
-//     async fn test_rw_seq() {
-//         let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
-//             .await
-//             .unwrap();
-//         test_single_write_and_read(&m, gen_seed()).await
-//     }
+    #[tokio::test]
+    async fn test_rw_seq() {
+        let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
+            .await
+            .unwrap();
+        test_single_write_and_read(&m, gen_seed()).await
+    }
 
-//     #[tokio::test]
-//     async fn test_guard_seq() {
-//         let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
-//             .await
-//             .unwrap();
-//         test_wrong_guard(&m, gen_seed()).await
-//     }
+    #[tokio::test]
+    async fn test_guard_seq() {
+        let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
+            .await
+            .unwrap();
+        test_wrong_guard(&m, gen_seed()).await
+    }
 
-//     #[tokio::test]
-//     async fn test_collision_seq() {
-//         let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
-//             .await
-//             .unwrap();
-//         test_rw_same_address(&m, gen_seed()).await
-//     }
+    #[tokio::test]
+    async fn test_collision_seq() {
+        let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
+            .await
+            .unwrap();
+        test_rw_same_address(&m, gen_seed()).await
+    }
 
-//     #[tokio::test]
-//     async fn test_rw_ccr() {
-//         let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
-//             .await
-//             .unwrap();
-//         test_guarded_write_concurrent(&m, gen_seed(), Some(100)).await
-//     }
-// }
+    #[tokio::test]
+    async fn test_rw_ccr() {
+        let m = SqliteMemory::<_, [u8; WORD_LENGTH]>::connect(DB_PATH)
+            .await
+            .unwrap();
+        test_guarded_write_concurrent(&m, gen_seed(), Some(100)).await
+    }
+}

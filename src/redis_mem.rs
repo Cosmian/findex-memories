@@ -141,47 +141,43 @@ impl<const ADDRESS_LENGTH: usize, const WORD_LENGTH: usize> MemoryADT
     }
 }
 
-// #[cfg(test)]
-// mod tests {
+#[cfg(test)]
+mod tests {
 
-//     use super::*;
-//     use crate::{
-//         test_utils::gen_seed,
-//         WORD_LENGTH,
-//         {
-//             test_guarded_write_concurrent, test_rw_same_address, test_single_write_and_read,
-//             test_wrong_guard,
-//         },
-//     };
+    use super::*;
+    use cosmian_findex::{
+        gen_seed, test_guarded_write_concurrent, test_rw_same_address, test_single_write_and_read,
+        test_wrong_guard, WORD_LENGTH,
+    };
 
-//     fn get_redis_url() -> String {
-//         std::env::var("REDIS_HOST").map_or_else(
-//             |_| "redis://localhost:6379".to_owned(),
-//             |var_env| format!("redis://{var_env}:6379"),
-//         )
-//     }
+    fn get_redis_url() -> String {
+        std::env::var("REDIS_HOST").map_or_else(
+            |_| "redis://localhost:6379".to_owned(),
+            |var_env| format!("redis://{var_env}:6379"),
+        )
+    }
 
-//     #[tokio::test]
-//     async fn test_rw_seq() {
-//         let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
-//         test_single_write_and_read::<WORD_LENGTH, _>(&m, gen_seed()).await
-//     }
+    #[tokio::test]
+    async fn test_rw_seq() {
+        let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
+        test_single_write_and_read::<WORD_LENGTH, _>(&m, gen_seed()).await
+    }
 
-//     #[tokio::test]
-//     async fn test_guard_seq() {
-//         let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
-//         test_wrong_guard::<WORD_LENGTH, _>(&m, gen_seed()).await
-//     }
+    #[tokio::test]
+    async fn test_guard_seq() {
+        let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
+        test_wrong_guard::<WORD_LENGTH, _>(&m, gen_seed()).await
+    }
 
-//     #[tokio::test]
-//     async fn test_collision_seq() {
-//         let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
-//         test_rw_same_address::<WORD_LENGTH, _>(&m, gen_seed()).await
-//     }
+    #[tokio::test]
+    async fn test_collision_seq() {
+        let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
+        test_rw_same_address::<WORD_LENGTH, _>(&m, gen_seed()).await
+    }
 
-//     #[tokio::test]
-//     async fn test_rw_ccr() {
-//         let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
-//         test_guarded_write_concurrent::<WORD_LENGTH, _>(&m, gen_seed(), None).await
-//     }
-// }
+    #[tokio::test]
+    async fn test_rw_ccr() {
+        let m = RedisMemory::connect(&get_redis_url()).await.unwrap();
+        test_guarded_write_concurrent::<WORD_LENGTH, _>(&m, gen_seed(), None).await
+    }
+}

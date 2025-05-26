@@ -27,7 +27,9 @@ cosmian_crypto_core = { version = "10.1", default-features = false, features = [
     "macro",
     "sha3",
 ] }
-cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories" }
+cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories", features = [
+    "test-utils",
+] }
 async-sqlite = { version = "0.4", optional = true }
 deadpool-postgres = { version = "0.14.1", optional = true }
 redis = { version = "0.31", features = [
