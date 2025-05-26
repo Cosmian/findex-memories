@@ -9,6 +9,8 @@ use futures::executor::block_on;
 use shared_utils::{decoder, encoder, gen_index, WORD_LENGTH};
 use std::collections::HashMap;
 
+const DB_PATH: &str = "redis://localhost:6379";
+
 #[tokio::main]
 async fn main() {
     // For cryptographic applications, it is important to use a secure RNG. In
@@ -26,11 +28,9 @@ async fn main() {
     // For this example, we use the `RedisMemory` implementation of the `MemoryADT`
     // trait. It connects to a Redis instance and uses it as a key-value store
     // for our Findex data structures, which is suitable for production applications.
-    let memory = RedisMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect(
-        "redis://localhost:6379",
-    )
-    .await
-    .unwrap();
+    let memory = RedisMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect(DB_PATH)
+        .await
+        .unwrap();
 
     let encrypted_memory = MemoryEncryptionLayer::new(&key, memory);
 

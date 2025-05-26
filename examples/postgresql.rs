@@ -4,7 +4,7 @@ mod shared_utils;
 
 use cosmian_crypto_core::{reexport::rand_core::SeedableRng, CsRng, Secret};
 use cosmian_findex::{Address, Findex, IndexADT, MemoryEncryptionLayer, ADDRESS_LENGTH};
-use cosmian_findex_memories::{PostgresMemory, PostgresMemoryError, RedisMemory};
+use cosmian_findex_memories::{PostgresMemory, PostgresMemoryError};
 use deadpool_postgres::{Config, Pool};
 use futures::executor::block_on;
 use shared_utils::{decoder, encoder, gen_index, WORD_LENGTH};
@@ -14,8 +14,7 @@ use tokio_postgres::NoTls;
 const DB_URL: &str = "postgres://cosmian:cosmian@localhost/cosmian";
 const TABLE_NAME: &str = "findex_example";
 
-// Template function for pool creation
-pub async fn create_pool(db_url: &str) -> Result<Pool, PostgresMemoryError> {
+async fn create_pool(db_url: &str) -> Result<Pool, PostgresMemoryError> {
     let mut pg_config = Config::new();
     pg_config.url = Some(db_url.to_string());
     let pool = pg_config.builder(NoTls)?.build()?;
@@ -51,11 +50,16 @@ async fn main() {
         .await
         .unwrap();
 
-    // For this example, we use the `RedisMemory` implementation of the `MemoryADT`
-    // trait. It connects to a Redis instance and uses it as a key-value store
-    // for our Findex data structures, which is suitable for production applications.
-    let memory = RedisMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect(
-        "redis://localhost:6379",
+    // Addd the following service to your pg_service.conf file (usually under ~/.pg_service.conf):
+    //
+    // [cosmian_service]
+    // host=localhost
+    // dbname=cosmian
+    // user=cosmian
+    // password=cosmian
+    let memory = PostgresMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect_with_pool(
+        pool.clone(),
+        TABLE_NAME.to_string(),
     )
     .await
     .unwrap();
@@ -89,7 +93,7 @@ async fn main() {
     // ... and verify we get the whole index back!
     assert_eq!(res, index);
 
-    // Cleanup - drop the table to avoid flacky tests
+    // Drop the table to avoid problems with subsequent runs
     pool.get()
         .await
         .unwrap()
