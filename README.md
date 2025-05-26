@@ -17,8 +17,7 @@ This library provides implementations for the following storage systems:
 | `sqlite-mem` | SQLite | [async-sqlite](https://crates.io/crates/async-sqlite) v0.4 * |
 | `postgres-mem` | PostgreSQL | [tokio-postgres](https://crates.io/crates/tokio-postgres) v0.7.9<br>[tokio](https://crates.io/crates/tokio) v1.44<br>[deadpool-postgres](https://crates.io/crates/deadpool-postgres) v0.14.1 |
  
- *`async-sqlite` dependency is pinned at v0.4 due to dependency tree issues with sqlx requiring a lower version of `libsqlite3-sys`
-  
+
 ## Usage
 
 First, add `cosmian_findex_memories` as dependency to your project :

@@ -27,9 +27,8 @@ cosmian_crypto_core = { version = "10.1", default-features = false, features = [
     "macro",
     "sha3",
 ] }
-cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories", features = [
-    "test-utils",
-] }
+cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories" }
+# `async-sqlite` dependency is pinned at v0.4 due to dependency tree issues with sqlx requiring a lower version of `libsqlite3-sys`
 async-sqlite = { version = "0.4", optional = true }
 deadpool-postgres = { version = "0.14.1", optional = true }
 redis = { version = "0.31", features = [
@@ -44,10 +43,28 @@ tokio = { version = "1.44", optional = true }
 
 
 [dev-dependencies]
+cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories", features = [
+    "test-utils",
+] }
 tokio = { version = "1.44", features = ["macros", "rt-multi-thread"] }
+criterion = { version = "0.6" }
+futures = { version = "0.3" }
+rand = { version = "0.9.0" }
+rand_distr = { version = "0.5.1" }
 
-# TODO: keep this ?
-# [[bench]]
-# name = "benches"
-# harness = false
-# required-features = ["test-utils"]
+[[bench]]
+name = "benches"
+harness = false
+required-features = ["test-utils"]
+
+[[example]]
+name = "redis"
+required-features = ["redis-mem"]
+
+[[example]]
+name = "sqlite"
+required-features = ["sqlite-mem"]
+
+[[example]]
+name = "postgresql"
+required-features = ["postgres-mem"]
