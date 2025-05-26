@@ -27,9 +27,7 @@ cosmian_crypto_core = { version = "10.1", default-features = false, features = [
     "macro",
     "sha3",
 ] }
-cosmian_findex = { version = "7.1.0" }
-# Due to dependency tree issues with sqlx requiring a lower version of `libsqlite3-sys`, do not upgrade the `async-sqlite` version above 0.4
-# before checking the update will not break findex-server's build.
+cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories" }
 async-sqlite = { version = "0.4", optional = true }
 deadpool-postgres = { version = "0.14.1", optional = true }
 redis = { version = "0.31", features = [

@@ -30,13 +30,16 @@ cargo add cosmian_findex_memories # do not forget to enable the adequate feature
 If you don't have a running `Redis` or `Postgres` instance running, you can use the one provided on the root by running `docker-compose up`, then on your application's code :
 
 ```rust
-use cosmian_findex::{ADDRESS_LENGTH, Findex, Address, dummy_decode, dummy_encode,WORD_LENGTH};
 // For Redis
 use cosmian_findex_memories::postgres::RedisMemory;
+use cosmian_findex::{ADDRESS_LENGTH, Findex, Address, dummy_decode, dummy_encode,WORD_LENGTH};
     
 let memory = RedisMemory::<Address<ADDRESS_LENGTH>, [u8; WORD_LENGTH]>::connect(
     "redis://localhost:6379",
 ).await.unwrap();
+
+// optionally, add an encryption layer (recommended)
+// let memory = MemoryEncryptionLayer::new(&key, InMemory::default());
 
 let findex = Findex::new(memory, dummy_encode::<WORD_LENGTH, Value>, dummy_decode);
 
@@ -55,6 +58,8 @@ assert_eq!(
     cat_res
 );
 ```
+
+More detailed examples can be found under the [examples folder](examples).
 
 ## Related Projects
 - [Findex](github.com/cosmian/findex) - The core Findex library
