@@ -18,7 +18,6 @@ name = "cosmian_findex_memories"
 path = "src/lib.rs"
 
 [features]
-default = ["redis-mem"]
 redis-mem = ["redis"]
 sqlite-mem = ["async-sqlite"]
 postgres-mem = ["tokio-postgres", "tokio", "deadpool-postgres"]
