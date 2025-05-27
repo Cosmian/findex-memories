@@ -28,8 +28,7 @@ cosmian_crypto_core = { version = "10.1", default-features = false, features = [
     "sha3",
 ] }
 cosmian_findex = { git = "https://github.com/Cosmian/findex/", branch = "refactor/migrate_findex_memories" }
-# `async-sqlite` dependency is pinned at v0.4 due to dependency tree issues with sqlx requiring a lower version of `libsqlite3-sys`
-async-sqlite = { version = "0.4", optional = true }
+async-sqlite = { version = "0.4", optional = true } # `async-sqlite` dependency is pinned at v0.4 due to dependency tree issues with sqlx requiring a lower version of `libsqlite3-sys`
 deadpool-postgres = { version = "0.14.1", optional = true }
 redis = { version = "0.31", features = [
     "aio",
