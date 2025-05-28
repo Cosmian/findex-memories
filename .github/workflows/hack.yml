@@ -1,0 +1,43 @@
+---
+name: Features powerset checks
+
+on: pull_request
+
+jobs:
+  hack:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: cosmian
+          POSTGRES_PASSWORD: cosmian
+          POSTGRES_DB: cosmian
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check storage
+        run: df -h
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install cargo-hack
+        run: cargo install --locked cargo-hack || true
+      - name: Test all feature combinations
+        run: cargo hack test --feature-powerset --clean-per-run
